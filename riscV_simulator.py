@@ -174,6 +174,7 @@ def sll(instruction_line):
 
     return line_counter+1
 
+# Excetuing the instructions in the file using if else ladder
 def execute_instructions(line):
     if re.findall(r"^\w*\s*:",line):
         label=line.split(token=":",maxaplit=1)
@@ -203,8 +204,13 @@ def execute_instructions(line):
         return lw(instruction_line)
     if cue=="sw":
         return sw(instruction_line)
-    if cur=="li":
+    if cue=="li":
         return li(instruction_line)
+
+    if cue=="sll":
+        return sll(instruction_line)
+    if cue=="j":
+        return j(instruction_line)
     else:
         print("Invalid instruction! Please vet your code")
 
