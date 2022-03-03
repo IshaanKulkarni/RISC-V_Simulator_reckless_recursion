@@ -109,6 +109,14 @@ def sub(instruction_line):
         print("Invalid instruction format!")
     return line_counter+1
 
+def mul(instruction_line):
+    instruction_line=instruction_line.split(",")
+    for i in range(len(instruction_line)):
+        instruction_line[i]=str(instruction_line[i].strip()[1:])
+    if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
+        registers[instruction_line[0]]=int(registers[instruction_line[1]])*inst(registers[instruction_line[2]])
+    else:
+        print("Invalid instruction format!")
 # Function to perform bne instruction. Will be used to implement if/else/ loops in assembly
 def bne(instruction_line):
     instruction_line=instruction_line.split(",")
@@ -128,6 +136,10 @@ def beq(instruction_line):
     if registers[instruction_line[0]]!=registers[instruction_line[1]]:
         return line_counter+1
     return int(instruction_label[instruction_line[2]])
+
+# Function to perform j (jump) instruction. Will be used to implement for loops when required
+def j(instruction_line):
+    return instruction_label[instruction_line]
 
 # Load word instruction function
 def lw(instruction_line):
@@ -151,6 +163,15 @@ def li(instruction_line):
         instruction_line[i]=str(instruction_line[l],strip()[1:])
     instruction_line[1]=instruction_line[1].strip()
     registers[instruction_line[0]]=int(instruction_line[1])
+    return line_counter+1
+
+# Bit manipulation instructions
+def sll(instruction_line):
+    instruction_line=instruction_line.split(",")
+    for i in range(len(instruction_line)-1):
+        instruction_line[i]=str(instruction_line[i].strip()[1:])
+    registers[instruction_line[0]]=int(registers[instruction_line[1]]*pow(2,instruction_line[2]))
+
     return line_counter+1
 
 def execute_instructions(line):
