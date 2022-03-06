@@ -21,6 +21,12 @@ c=[]
 registers={'x0':0,'x1':0,'x2':0,'x3':0,'x4':0,'x5':0,'x6':0,'x7':0,'x8':0,'x9':0,'x10':0,'x11':0,'x12':0,'x13':0,'x14':0,'x15':0,'x16':0,'x17':0,'x18':0,'x19':0,'x20':0,'x21':0,'x22':0,'x23':0,'x24':0,'x25':0,'x26':0,'x27':0,'x28':0,'x29':0,'x30':0,'x31':0}
 BaseAddress="0x1000"
 # Below function will remove all comments and white spaces from the given .asm file
+
+
+def throwError(line):
+    print(f"syntax error at line {line}")
+
+
 def sanitize():
     i=0
     while i<len(lines):
@@ -68,6 +74,13 @@ def process():
                     line=re.sub(r"\\t","\t", line)
                     RAM.append(line)
                     ram_index+=1
+                else:
+                    throwError(i)
+                    return
+        # once everything is done ==> the next step is to find globl main --> at which the original program will begin
+        if(re.findall(r"\.globl",lines[i])):
+            i+=1
+            break
 
         i+=1;    
 
@@ -76,6 +89,7 @@ def process():
 
     line_counter=i
     print(line_counter)
+    
     # Removing all the comments from the instructions
     while(i<len(lines)):
         occ=lines[i].find('#')
@@ -93,48 +107,64 @@ def process():
             label=lines[i].split(token=":",maxsplit=1)[0].strip()
             instruction_label[label]=i 
         i+=1
+
+    return line_counter
+
+
+
 # Function to perform add instruction 
-def add(instruction_line):
+def add(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)):
         instruction_line[i]=str(instruction_line[i].strip()[1:])
+
+
+
     if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
-        registers[instruction_line[0]]=int(registers[instruction_line[1]])+inst(registers[instruction_line[2]])
+        registers[instruction_line[0]]=int(registers[instruction_line[1]])+int(registers[instruction_line[2]])
     else:
         print("Invalid instruction format!")
-    return line_counter+1
+        return -1
+    return line_counter + 1
 
 # Function to perform subtract instruction
-def sub(instruction_line):
+def sub(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)):
         instruction_line[i]=str(instruction_line[i].strip()[1:])
     if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
-        registers[instruction_line[0]]=int(registers[instruction_line[1]])-inst(registers[instruction_line[2]])
+        registers[instruction_line[0]]=int(registers[instruction_line[1]])-int(registers[instruction_line[2]])
     else:
         print("Invalid instruction format!")
-    return line_counter+1
+        return -1
+    return line_counter + 1
 
-def mul(instruction_line):
+def mul(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)):
         instruction_line[i]=str(instruction_line[i].strip()[1:])
     if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
-        registers[instruction_line[0]]=int(registers[instruction_line[1]])*inst(registers[instruction_line[2]])
+        registers[instruction_line[0]]=int(registers[instruction_line[1]])*int(registers[instruction_line[2]])
     else:
         print("Invalid instruction format!")
+        return -1
+    return line_counter + 1
+
+
 # Function to perform bne instruction. Will be used to implement if/else/ loops in assembly
-def bne(instruction_line):
+def bne(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)-1):
         instruction_line[i]=str(instruction_line[i].strip()[1:])
+
     instruction_line[2]=instruction_line[2].strip()
+
     if registers[instruction_line[0]]==registers[instruction_line[1]]:
         return line_counter+1
     return int(instruction_label[instruction_line[2]])
 
 # Function to perform beq instruction. Will be used to implement if/else/ loops in assembly
-def beq(instruction_line):
+def beq(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)-1):
         instruction_line[i]=str(instruction_line[i].strip()[1:])
@@ -144,35 +174,41 @@ def beq(instruction_line):
     return int(instruction_label[instruction_line[2]])
 
 # Function to perform j (jump) instruction. Will be used to implement for loops when required
-def j(instruction_line):
+def j(instruction_line,line_counter):
     return instruction_label[instruction_line]
 
 # Load word instruction function
-def lw(instruction_line):
+def lw(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     instruction_line[0]=str(instruction_line[0].strip()[1:])
     instruction_line[1]=instruction_line[1].strip()
     forward=int(instruction_line[1].split(token1="(",maxaplit=1)[0])//4
     registers[instruction_line[0]]=RAM[int(registers[instruction_line[1][2:]])-int(BaseAddress[2:])+forward]
     return line_counter+1
+
+
 # Save word instruction function
-def sw(instruction_line):
+def sw(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     instruction_line[0]=str(instruction_line[0].strip()[1:])
     instruction_line[1]=instruction_line[1].strip()
     forward=int(instruction_line[1].split(token1="(",maxaplit=1)[0])//4
     RAM[int(registers[instruction_line[1][2:]])-int(BaseAddress[2:])+forward]=registers[instruction_line[0]]
     return line_counter+1
-def li(instruction_line):
+
+
+
+def li(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)-1):
-        instruction_line[i]=str(instruction_line[l],strip()[1:])
+        instruction_line[i]=str(instruction_line[i].strip())
+        
     instruction_line[1]=instruction_line[1].strip()
     registers[instruction_line[0]]=int(instruction_line[1])
     return line_counter+1
 
 # Bit manipulation instructions
-def sll(instruction_line):
+def sll(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)-1):
         instruction_line[i]=str(instruction_line[i].strip()[1:])
@@ -181,7 +217,8 @@ def sll(instruction_line):
     return line_counter+1
 
 # Excetuing the instructions in the file using if else ladder
-def execute_instructions(line):
+def execute_instructions(line,line_counter):
+    print(line)
     if re.findall(r"^\w*\s*:",line):
         label=line.split(token=":",maxaplit=1)
         line=label[1].strip()
@@ -199,24 +236,24 @@ def execute_instructions(line):
     cue=cue[0]
 
     if cue=="add":
-        return add(instruction_line)
+        return add(instruction_line,line_counter)
     if cue=="sub":
-        return sub(instruction_line)
+        return sub(instruction_line,line_counter)
     if cue=="bne":
-        return bne(instruction_line)
+        return bne(instruction_line,line_counter)
     if cue=="beq":
-        return beq(instruction_line)
+        return beq(instruction_line,line_counter)
     if cue=="lw":
-        return lw(instruction_line)
+        return lw(instruction_line,line_counter)
     if cue=="sw":
-        return sw(instruction_line)
+        return sw(instruction_line,line_counter)
     if cue=="li":
-        return li(instruction_line)
+        return li(instruction_line,line_counter)
 
     if cue=="sll":
-        return sll(instruction_line)
+        return sll(instruction_line,line_counter)
     if cue=="j":
-        return j(instruction_line)
+        return j(instruction_line,line_counter)
     else:
         print(cue)
         print("Invalid instruction! Please vet your code")
@@ -224,9 +261,11 @@ def execute_instructions(line):
 
 def reckless():
     sanitize()
-    process()
+    line_counter = process()
+        
     while line_counter< len(lines):
-        line_counter = execute_instructions(lines[line_counter])
+        print(line_counter)
+        line_counter = execute_instructions(lines[line_counter],line_counter)
         if(line_counter == -1):
             break
 
@@ -235,8 +274,6 @@ def reckless():
     print("State of Registers after execution: ")
     print(registers)
 
-def recursion():
-    line_counter=execute_instructions(lines[line_counter])
 
 if __name__ == "__main__":
     reckless()
