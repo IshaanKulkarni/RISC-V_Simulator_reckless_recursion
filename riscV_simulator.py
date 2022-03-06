@@ -1,12 +1,16 @@
-# CO Project phase 1: Team reckless_recursion
-# We are using regex and string formatting to extract and work on instructions using an if else ladder
+''' CO Project Phase 1: Team Reckless_Recursion:
+Project Methodology: To parse through the text easily, we have used the 
+regex module of python. After identifying the instructions, we are executing them using a final function
+which consists of an if else ladder.
+
+Contributors:
+CS20B046- Soham Nandy
+CS20B018- Ishaan Kulkarni'''
 import re
 file=open("test1.asm","r")
 lines=file.readlines()
 print(lines)
 file.close()
-
-
 global RAM, ram_index, ram_label, instruction_label,i,c
 line_counter = 0
 RAM=[]
@@ -15,18 +19,15 @@ ram_label={}
 instruction_label={}
 line_counter=0
 c=[]
-
 # Add syntax error class here later
 # 32 integer registers of RISC-V. Register x0 is hardwired to 0 and is equivalent to $zero register of MIPS
 registers={'x0':0,'x1':0,'x2':0,'x3':0,'x4':0,'x5':0,'x6':0,'x7':0,'x8':0,'x9':0,'x10':0,'x11':0,'x12':0,'x13':0,'x14':0,'x15':0,'x16':0,'x17':0,'x18':0,'x19':0,'x20':0,'x21':0,'x22':0,'x23':0,'x24':0,'x25':0,'x26':0,'x27':0,'x28':0,'x29':0,'x30':0,'x31':0}
 BaseAddress="0x1000"
-# Below function will remove all comments and white spaces from the given .asm file
-
-
+# Function to throw syntax error
 def throwError(line):
     print(f"syntax error at line {line}")
 
-
+# Below function will remove all comments and white spaces from the given .asm file
 def sanitize():
     i=0
     while i<len(lines):
@@ -184,7 +185,7 @@ def lw(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     instruction_line[0]=str(instruction_line[0].strip())
     instruction_line[1]=instruction_line[1].strip()
-    forward=int(instruction_line[1].split(token1="(",maxaplit=1)[0])//4
+    forward=int(instruction_line[1].split("(",maxsplit=1)[0])//4
     registers[instruction_line[0]]=RAM[int(registers[instruction_line[1][2:]])-int(BaseAddress[2:])+forward]
     return line_counter+1
 
@@ -194,12 +195,12 @@ def sw(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     instruction_line[0]=str(instruction_line[0].strip())
     instruction_line[1]=instruction_line[1].strip()
-    forward=int(instruction_line[1].split(token1="(",maxaplit=1)[0])//4
+    forward=int(instruction_line[1].split("(",maxsplit=1)[0])//4
     RAM[int(registers[instruction_line[1][2:]])-int(BaseAddress[2:])+forward]=registers[instruction_line[0]]
     return line_counter+1
 
 
-
+# Load immediate function: Used to load an int directly to a register
 def li(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)-1):
@@ -214,7 +215,7 @@ def sll(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)-1):
         instruction_line[i]=str(instruction_line[i].strip())
-    registers[instruction_line[0]]=int(registers[instruction_line[1]]*pow(2,instruction_line[2]))
+    registers[instruction_line[0]]=int(registers[instruction_line[1]]*pow(2,int(instruction_line[2])))
 
     return line_counter+1
 
