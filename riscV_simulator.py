@@ -2,14 +2,16 @@
 Project Methodology: To parse through the text easily, we have used the 
 regex module of python. After identifying the instructions, we are executing them using a final function
 which consists of an if else ladder.
-
+The code to be run can be pasted in the test1.asm file and the simulator can be run. Finally, you will be able to 
+see the state of the registers in the end.
 Contributors:
 CS20B046- Soham Nandy
 CS20B018- Ishaan Kulkarni'''
 import re
 file=open("test1.asm","r")
 lines=file.readlines()
-print(lines)
+# print("Entered program is: ")
+# print(lines)
 file.close()
 global RAM, ram_index, ram_label, instruction_label,i,c
 line_counter = 0
@@ -40,7 +42,7 @@ def sanitize():
             lines.remove(lines[i])
             i-=1
         i+=1
-    print(lines)
+    # print(lines)
 
 def process():
     RAM.clear()
@@ -89,7 +91,7 @@ def process():
     print("-"*100)
 
     line_counter=i
-    print(line_counter)
+    # print(line_counter)
     
     # Removing all the comments from the instructions
     while(i<len(lines)):
@@ -118,8 +120,6 @@ def add(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)):
         instruction_line[i]=str(instruction_line[i].strip())
-    print (instruction_line[1]) 
-    print (instruction_line[2])
 
     if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
         registers[instruction_line[0]]=int(registers[instruction_line[1]])+int(registers[instruction_line[2]])
@@ -170,7 +170,6 @@ def beq(instruction_line,line_counter):
     for i in range(len(instruction_line)):
         instruction_line[i]=str(instruction_line[i].strip())
 
-    print(instruction_line)
     instruction_line[2]=instruction_line[2].strip()
     if registers[instruction_line[0]]!=registers[instruction_line[1]]:
         return line_counter+1
@@ -221,7 +220,6 @@ def sll(instruction_line,line_counter):
 
 # Excetuing the instructions in the file using if else ladder
 def execute_instructions(line,line_counter):
-    print(line)
     if re.findall(r"^\w*\s*:",line):
         label=line.split(":",maxsplit=1)
         line=label[1].strip()
@@ -269,12 +267,12 @@ def reckless():
     line_counter = process()
         
     while line_counter< len(lines):
-        print(line_counter)
+        # print(line_counter)
         line_counter = execute_instructions(lines[line_counter],line_counter)
         if(line_counter == -1):
             break
 
-    print("Memory after execution \n",RAM)
+    print("Memory after execution: \n",RAM)
     print("-"*100)
     print("State of Registers after execution: ")
     print(registers)
