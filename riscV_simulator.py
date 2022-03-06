@@ -7,7 +7,8 @@ print(lines)
 file.close()
 
 
-global RAM, ram_index, ram_label, instruction_label,line_counter,i,c
+global RAM, ram_index, ram_label, instruction_label,i,c
+line_counter = 0
 RAM=[]
 ram_index=0
 ram_label={}
@@ -32,6 +33,7 @@ def sanitize():
             lines.remove(lines[i])
             i-=1
         i+=1
+    print(lines)
 
 def process():
     RAM.clear()
@@ -66,10 +68,14 @@ def process():
                     line=re.sub(r"\\t","\t", line)
                     RAM.append(line)
                     ram_index+=1
+
+        i+=1;    
+
     print("Memory: ", RAM)
     print("-"*100)
 
     line_counter=i
+    print(line_counter)
     # Removing all the comments from the instructions
     while(i<len(lines)):
         occ=lines[i].find('#')
@@ -212,14 +218,17 @@ def execute_instructions(line):
     if cue=="j":
         return j(instruction_line)
     else:
+        print(cue)
         print("Invalid instruction! Please vet your code")
+        return -1
 
 def reckless():
     sanitize()
     process()
-
     while line_counter< len(lines):
-        recursion()
+        line_counter = execute_instructions(lines[line_counter])
+        if(line_counter == -1):
+            break
 
     print("Memory after execution \n",RAM)
     print("-"*100)
@@ -229,6 +238,6 @@ def reckless():
 def recursion():
     line_counter=execute_instructions(lines[line_counter])
 
-
-reckless()
+if __name__ == "__main__":
+    reckless()
 
