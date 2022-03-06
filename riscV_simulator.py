@@ -104,7 +104,7 @@ def process():
     i=line_counter
     while(i<len(lines)):
         if re.findall(r"^\w*:",lines[i]):
-            label=lines[i].split(token=":",maxsplit=1)[0].strip()
+            label=lines[i].split(":",maxsplit=1)[0].strip()
             instruction_label[label]=i 
         i+=1
 
@@ -116,9 +116,9 @@ def process():
 def add(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)):
-        instruction_line[i]=str(instruction_line[i].strip()[1:])
-
-
+        instruction_line[i]=str(instruction_line[i].strip())
+    print (instruction_line[1]) 
+    print (instruction_line[2])
 
     if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
         registers[instruction_line[0]]=int(registers[instruction_line[1]])+int(registers[instruction_line[2]])
@@ -131,7 +131,7 @@ def add(instruction_line,line_counter):
 def sub(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)):
-        instruction_line[i]=str(instruction_line[i].strip()[1:])
+        instruction_line[i]=str(instruction_line[i].strip())
     if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
         registers[instruction_line[0]]=int(registers[instruction_line[1]])-int(registers[instruction_line[2]])
     else:
@@ -142,7 +142,7 @@ def sub(instruction_line,line_counter):
 def mul(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)):
-        instruction_line[i]=str(instruction_line[i].strip()[1:])
+        instruction_line[i]=str(instruction_line[i].strip())
     if isinstance(registers[instruction_line[1]],int) and isinstance(registers[instruction_line[2]],int):
         registers[instruction_line[0]]=int(registers[instruction_line[1]])*int(registers[instruction_line[2]])
     else:
@@ -154,8 +154,8 @@ def mul(instruction_line,line_counter):
 # Function to perform bne instruction. Will be used to implement if/else/ loops in assembly
 def bne(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
-    for i in range(len(instruction_line)-1):
-        instruction_line[i]=str(instruction_line[i].strip()[1:])
+    for i in range(len(instruction_line)):
+        instruction_line[i]=str(instruction_line[i].strip())
 
     instruction_line[2]=instruction_line[2].strip()
 
@@ -166,8 +166,10 @@ def bne(instruction_line,line_counter):
 # Function to perform beq instruction. Will be used to implement if/else/ loops in assembly
 def beq(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
-    for i in range(len(instruction_line)-1):
-        instruction_line[i]=str(instruction_line[i].strip()[1:])
+    for i in range(len(instruction_line)):
+        instruction_line[i]=str(instruction_line[i].strip())
+
+    print(instruction_line)
     instruction_line[2]=instruction_line[2].strip()
     if registers[instruction_line[0]]!=registers[instruction_line[1]]:
         return line_counter+1
@@ -180,7 +182,7 @@ def j(instruction_line,line_counter):
 # Load word instruction function
 def lw(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
-    instruction_line[0]=str(instruction_line[0].strip()[1:])
+    instruction_line[0]=str(instruction_line[0].strip())
     instruction_line[1]=instruction_line[1].strip()
     forward=int(instruction_line[1].split(token1="(",maxaplit=1)[0])//4
     registers[instruction_line[0]]=RAM[int(registers[instruction_line[1][2:]])-int(BaseAddress[2:])+forward]
@@ -190,7 +192,7 @@ def lw(instruction_line,line_counter):
 # Save word instruction function
 def sw(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
-    instruction_line[0]=str(instruction_line[0].strip()[1:])
+    instruction_line[0]=str(instruction_line[0].strip())
     instruction_line[1]=instruction_line[1].strip()
     forward=int(instruction_line[1].split(token1="(",maxaplit=1)[0])//4
     RAM[int(registers[instruction_line[1][2:]])-int(BaseAddress[2:])+forward]=registers[instruction_line[0]]
@@ -211,7 +213,7 @@ def li(instruction_line,line_counter):
 def sll(instruction_line,line_counter):
     instruction_line=instruction_line.split(",")
     for i in range(len(instruction_line)-1):
-        instruction_line[i]=str(instruction_line[i].strip()[1:])
+        instruction_line[i]=str(instruction_line[i].strip())
     registers[instruction_line[0]]=int(registers[instruction_line[1]]*pow(2,instruction_line[2]))
 
     return line_counter+1
@@ -220,7 +222,7 @@ def sll(instruction_line,line_counter):
 def execute_instructions(line,line_counter):
     print(line)
     if re.findall(r"^\w*\s*:",line):
-        label=line.split(token=":",maxaplit=1)
+        label=line.split(":",maxsplit=1)
         line=label[1].strip()
         label=label[0].strip()
         instruction_label[label]=line_counter
@@ -249,6 +251,8 @@ def execute_instructions(line,line_counter):
         return sw(instruction_line,line_counter)
     if cue=="li":
         return li(instruction_line,line_counter)
+    if cue=="mul":
+        return mul(instruction_line,line_counter)
 
     if cue=="sll":
         return sll(instruction_line,line_counter)
