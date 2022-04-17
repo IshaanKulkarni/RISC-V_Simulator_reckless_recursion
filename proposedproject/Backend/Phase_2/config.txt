@@ -1,0 +1,91 @@
+ * Serving Flask app "app" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+['li x1,14', 'li x2,25', 'add x1,x2.x3', 'sub x4,x5,x6', 'pass_PC', 'pass_PC', 'pass_PC', 'end_PC']
+Memory:  []
+----------------------------------------------------------------------------------------------------
+clock :  1
+====================================================================================================
+Current Clock Cycle:  1
+Passed WB
+Passed MEM
+Pass Ex
+Passed ID/RF
+====================================================================================================
+0
+====================================================================================================
+4  Length of lines
+1  p[0].current_line
+fetched line  li x1,14
+
+Executed IF on line:  li x1,14
+
+clock :  2
+====================================================================================================
+Current Clock Cycle:  2
+Passed WB
+Passed MEM
+Pass Ex
+Executed ID/RF on line  li x1,14
+
+====================================================================================================
+1
+====================================================================================================
+4  Length of lines
+2  p[0].current_line
+fetched line  li x2,25
+
+Executed IF on line:  li x2,25
+
+clock :  3
+====================================================================================================
+Current Clock Cycle:  3
+Passed WB
+Passed MEM
+Instruction_line:  li x1,14
+
+Instruction_word:  li
+Executed EX on line  li ['li x1', '14']
+Current Line:  1
+line  ['li', 'x2,25']
+Executed ID/RF on line  li x2,25
+
+====================================================================================================
+2
+====================================================================================================
+4  Length of lines
+3  p[0].current_line
+fetched line  add x1,x2.x3
+
+Executed IF on line:  add x1,x2.x3
+
+clock :  4
+====================================================================================================
+Current Clock Cycle:  4
+Passed WB
+Executed Mem on line  ['li x1', '14']
+Instruction_line:  li x2,25
+
+Instruction_word:  li
+Executed EX on line  li ['li x2', '25']
+Current Line:  2
+line  ['add', 'x1,x2.x3']
+Executed ID/RF on line  add x1,x2.x3
+
+====================================================================================================
+3
+====================================================================================================
+4  Length of lines
+4  p[0].current_line
+fetched line  sub x4,x5,x6
+Executed IF on line:  sub x4,x5,x6
+clock :  5
+====================================================================================================
+Current Clock Cycle:  5
+Executed WB on line  ['li x1', '14']
+Executed Mem on line  ['li x2', '25']
+Instruction_line:  add x1,x2.x3
+
+Instruction_word:  add
